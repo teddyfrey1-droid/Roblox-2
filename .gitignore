@@ -1,0 +1,21 @@
+# Roblox / Rojo
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+*.rbxm
+*.rbxmx
+
+# Outils
+/.foreman
+/foreman.lock
+**/wally.lock
+/Packages
+/ServerPackages
+/DevPackages
+
+# Système
+.DS_Store
+Thumbs.db
+*.log
+.vscode/

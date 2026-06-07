@@ -1,0 +1,74 @@
+{
+  "name": "PowerTycoon",
+  "globIgnorePaths": ["**/.DS_Store"],
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+
+    "ServerScriptService": {
+      "$path": "src/server"
+    },
+
+    "ServerStorage": {
+      "Modules": {
+        "$path": "src/serverstorage"
+      }
+    },
+
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "$path": "src/client"
+      }
+    },
+
+    "Workspace": {
+      "$properties": {
+        "FilteringEnabled": true,
+        "Gravity": 196.2
+      }
+    },
+
+    "Lighting": {
+      "$properties": {
+        "Technology": "Future",
+        "Ambient": [60, 64, 78],
+        "OutdoorAmbient": [90, 96, 110],
+        "Brightness": 2.5,
+        "ClockTime": 14.5,
+        "GeographicLatitude": 20,
+        "ExposureCompensation": 0.2
+      },
+      "Atmosphere": {
+        "$className": "Atmosphere",
+        "$properties": {
+          "Density": 0.32,
+          "Offset": 0.1,
+          "Color": [180, 190, 210],
+          "Decay": [110, 120, 150],
+          "Glare": 0.4,
+          "Haze": 1.8
+        }
+      },
+      "SunRays": {
+        "$className": "SunRaysEffect",
+        "$properties": {
+          "Intensity": 0.12,
+          "Spread": 0.7
+        }
+      },
+      "Bloom": {
+        "$className": "BloomEffect",
+        "$properties": {
+          "Intensity": 0.7,
+          "Size": 24,
+          "Threshold": 1.1
+        }
+      }
+    }
+  }
+}
