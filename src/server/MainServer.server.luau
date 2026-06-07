@@ -25,6 +25,7 @@ local ServerStorage = game:GetService("ServerStorage")
 -- ----- Modules partagés -----
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local GameConfig = require(Shared:WaitForChild("GameConfig"))
+local Format = require(Shared:WaitForChild("Format"))
 local Remotes = require(Shared:WaitForChild("Remotes"))
 
 -- ----- Services serveur -----
@@ -32,6 +33,8 @@ local Modules = ServerStorage:WaitForChild("Modules")
 local DataService = require(Modules:WaitForChild("DataService"))
 local MarketService = require(Modules:WaitForChild("MarketService"))
 local MonetizationService = require(Modules:WaitForChild("MonetizationService"))
+local LeaderboardService = require(Modules:WaitForChild("LeaderboardService"))
+local EnvironmentService = require(Modules:WaitForChild("EnvironmentService"))
 local PlotService = require(Modules:WaitForChild("PlotService"))
 
 -- =========================================================================
@@ -42,10 +45,32 @@ local PlotService = require(Modules:WaitForChild("PlotService"))
 -- =========================================================================
 DataService:Init()
 MarketService:Init()
+EnvironmentService:Init()
+LeaderboardService:Init({ Data = DataService })
 MonetizationService:Init({ Data = DataService, Plot = PlotService })
-PlotService:Init({ Data = DataService, Market = MarketService, Monetization = MonetizationService })
+PlotService:Init({
+	Data = DataService,
+	Market = MarketService,
+	Monetization = MonetizationService,
+	Leaderboard = LeaderboardService,
+})
 
 print(string.format("[%s] Serveur initialisé.", GameConfig.Game.Name))
+
+-- Crée les leaderstats natifs (affichés dans la liste des joueurs Roblox)
+local function setupLeaderstats(player: Player, data: any)
+	local ls = Instance.new("Folder")
+	ls.Name = "leaderstats"
+	local money = Instance.new("StringValue")
+	money.Name = "Argent"
+	money.Value = Format.Money(data.Money)
+	money.Parent = ls
+	local rebirth = Instance.new("IntValue")
+	rebirth.Name = "Rebirth"
+	rebirth.Value = data.Rebirths
+	rebirth.Parent = ls
+	ls.Parent = player
+end
 
 -- =========================================================================
 --  CYCLE DE VIE DES JOUEURS
@@ -53,7 +78,8 @@ print(string.format("[%s] Serveur initialisé.", GameConfig.Game.Name))
 local function onPlayerAdded(player: Player)
 	-- 1) Données (avec sécurités anti-perte) — peut yield
 	local data = DataService:Load(player)
-	-- 2) Appartenance des gamepasses (en parallèle)
+	-- 2) leaderstats natifs + appartenance des gamepasses
+	setupLeaderstats(player, data)
 	MonetizationService:SetupPlayer(player)
 	-- 3) Construction + attribution du plot, puis téléportation du joueur
 	local ok, err = pcall(function()
@@ -65,6 +91,11 @@ local function onPlayerAdded(player: Player)
 end
 
 local function onPlayerRemoving(player: Player)
+	-- Publie le score final au classement avant de libérer les données
+	local data = DataService:Get(player)
+	if data then
+		LeaderboardService:Report(player.UserId, data.Stats.TotalEarned or 0)
+	end
 	PlotService:ReleasePlot(player)
 	MonetizationService:ClearPlayer(player)
 	DataService:Release(player) -- sauvegarde + nettoyage du cache

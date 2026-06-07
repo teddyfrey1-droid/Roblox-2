@@ -79,6 +79,13 @@ function PlotService:_buildPlot(plot: any)
 	local baseModel = BuildingFactory.CreatePlotBase(plot.origin, plot.player.DisplayName)
 	baseModel.Parent = folder
 
+	-- Jumbotron / classement mondial (mis à jour par LeaderboardService)
+	local lbModel, lbContent = BuildingFactory.CreateLeaderboard(CFrame.new(plot.origin + Vector3.new(0, 0, -90)))
+	lbModel.Parent = folder
+	if self.Leaderboard then
+		self.Leaderboard:Register(plot.userId, lbContent)
+	end
+
 	-- Batterie centrale animée (jauge de charge) — à droite
 	local batBase = plot.origin + Vector3.new(42, 0, 70)
 	plot.batteryPos = batBase + Vector3.new(0, 9, 0)
@@ -436,6 +443,19 @@ function PlotService:PushHUD(plot: any)
 	local maxW = GameConfig.MaxWatts(data.Progress, data.OwnedVIP)
 	local prod = self:_productionPerSecond(plot)
 	local ownsAuto = self.Monetization:OwnsGamepass(plot.player, "AutoSell")
+
+	-- leaderstats natifs (liste des joueurs Roblox)
+	local ls = plot.player:FindFirstChild("leaderstats")
+	if ls then
+		local m = ls:FindFirstChild("Argent")
+		if m then
+			(m :: StringValue).Value = Format.Money(data.Money)
+		end
+		local r = ls:FindFirstChild("Rebirth")
+		if r then
+			(r :: IntValue).Value = data.Rebirths
+		end
+	end
 	Remotes.Event("UpdateHUD"):FireClient(plot.player, {
 		Money = data.Money,
 		Watts = data.Watts,
@@ -531,6 +551,9 @@ function PlotService:ReleasePlot(player: Player)
 	if plot._charConn then
 		plot._charConn:Disconnect()
 	end
+	if self.Leaderboard then
+		self.Leaderboard:Unregister(player.UserId)
+	end
 	if plot.folder then
 		plot.folder:Destroy()
 	end
@@ -542,10 +565,11 @@ end
 --  INITIALISATION
 -- =========================================================================
 
-function PlotService:Init(deps: { Data: any, Market: any, Monetization: any })
+function PlotService:Init(deps: { Data: any, Market: any, Monetization: any, Leaderboard: any })
 	self.Data = deps.Data
 	self.Market = deps.Market
 	self.Monetization = deps.Monetization
+	self.Leaderboard = deps.Leaderboard
 	self.Plots = {}
 	self.UsedOrigins = {}
 

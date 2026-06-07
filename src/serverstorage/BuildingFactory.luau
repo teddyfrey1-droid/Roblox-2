@@ -634,4 +634,79 @@ function BuildingFactory.CreatePlotBase(origin: Vector3, ownerName: string): (Mo
 	return model, slab
 end
 
+-- =========================================================================
+--  JUMBOTRON / TABLEAU DES SCORES (écran 3D avec SurfaceGui)
+--  Renvoie le Model + le Frame "Content" où LeaderboardService écrit les lignes.
+-- =========================================================================
+function BuildingFactory.CreateLeaderboard(baseCFrame: CFrame): (Model, Frame)
+	local model = Instance.new("Model")
+	model.Name = "Leaderboard"
+	local accent = Color3.fromRGB(0, 200, 255)
+
+	local screen = newPart(model, {
+		Name = "Screen",
+		Size = Vector3.new(40, 18, 1),
+		Material = Enum.Material.SmoothPlastic,
+		Color = Color3.fromRGB(10, 12, 18),
+		CastShadow = true,
+		CFrame = baseCFrame * CFrame.new(0, 14, 0),
+	})
+	newPart(model, {
+		Name = "ScreenFrame",
+		Size = Vector3.new(41.5, 19.5, 0.6),
+		Material = Enum.Material.Neon,
+		Color = accent,
+		Transparency = 0.2,
+		CFrame = baseCFrame * CFrame.new(0, 14, 0.4),
+	})
+	for _, sx in ipairs({ -16, 16 }) do
+		newPart(model, {
+			Name = "Pillar",
+			Size = Vector3.new(1.4, 14, 1.4),
+			Material = Enum.Material.Metal,
+			Color = METAL,
+			CastShadow = true,
+			CFrame = baseCFrame * CFrame.new(sx, 7, 0),
+		})
+	end
+
+	-- SurfaceGui sur la face arrière (+Z) : tournée vers le joueur qui regarde sa base
+	local sg = Instance.new("SurfaceGui")
+	sg.Name = "Board"
+	sg.Face = Enum.NormalId.Back
+	sg.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+	sg.PixelsPerStud = 22
+	sg.LightInfluence = 0
+	sg.Parent = screen
+
+	local title = Instance.new("TextLabel")
+	title.Name = "Title"
+	title.Size = UDim2.new(1, 0, 0, 70)
+	title.BackgroundColor3 = accent
+	title.BorderSizePixel = 0
+	title.Text = "🏆  TOP VENDEURS MONDIAL"
+	title.Font = Enum.Font.GothamBlack
+	title.TextScaled = true
+	title.TextColor3 = Color3.fromRGB(10, 12, 18)
+	title.Parent = sg
+
+	local content = Instance.new("Frame")
+	content.Name = "Content"
+	content.Position = UDim2.new(0, 0, 0, 78)
+	content.Size = UDim2.new(1, 0, 1, -78)
+	content.BackgroundTransparency = 1
+	content.Parent = sg
+	local lpad = Instance.new("UIPadding")
+	lpad.PaddingLeft = UDim.new(0, 12)
+	lpad.PaddingRight = UDim.new(0, 12)
+	lpad.Parent = content
+	local layout = Instance.new("UIListLayout")
+	layout.Padding = UDim.new(0, 4)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+	layout.Parent = content
+
+	model.PrimaryPart = screen
+	return model, content
+end
+
 return BuildingFactory

@@ -25,9 +25,32 @@ local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Format = require(Shared:WaitForChild("Format"))
 local Remotes = require(Shared:WaitForChild("Remotes"))
+local GameConfig = require(Shared:WaitForChild("GameConfig"))
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
+
+-- =========================================================================
+--  SONS — un asset moteur garanti, varié par PlaybackSpeed/Volume selon l'action
+-- =========================================================================
+local SoundService = game:GetService("SoundService")
+local Sounds: { [string]: Sound } = {}
+for soundName, scfg in pairs(GameConfig.Sounds) do
+	local s = Instance.new("Sound")
+	s.Name = soundName
+	s.SoundId = scfg.Id
+	s.Volume = scfg.Volume
+	s.PlaybackSpeed = scfg.Speed
+	s.Parent = SoundService
+	Sounds[soundName] = s
+end
+local function playSound(name: string)
+	local s = Sounds[name]
+	if s then
+		s.TimePosition = 0
+		s:Play()
+	end
+end
 
 -- =========================================================================
 --  THÈME
@@ -118,8 +141,9 @@ local function makeInteractive(button: GuiButton, baseColor: Color3)
 	button.MouseLeave:Connect(function()
 		TweenService:Create(button, TweenInfo.new(0.12), { BackgroundColor3 = baseColor }):Play()
 	end)
-	-- Petit « flash » au clic
+	-- Petit « flash » + son au clic
 	button.MouseButton1Down:Connect(function()
+		playSound("Click")
 		button.BackgroundColor3 = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 		TweenService:Create(button, TweenInfo.new(0.18), { BackgroundColor3 = hover }):Play()
 	end)
@@ -451,6 +475,7 @@ local function openPanelFn(panel: Frame)
 		openPanel.Visible = false
 	end
 	openPanel = panel
+	playSound("Open")
 	backdrop.Visible = true
 	backdrop.BackgroundTransparency = 1
 	TweenService:Create(backdrop, TweenInfo.new(0.2), { BackgroundTransparency = 0.5 }):Play()
@@ -1144,8 +1169,10 @@ Remotes.Event("MarketUpdate").OnClientEvent:Connect(function(data)
 	Refs.MarketValue.TextColor3 = (data.Trend > 0) and Theme.Money or (data.Trend < 0) and Theme.Danger or Theme.Text
 	if data.Trend > 0 then
 		spawnToast("📈 Le prix de l'énergie monte !", Theme.Money)
+		playSound("Market")
 	elseif data.Trend < 0 then
 		spawnToast("📉 Le prix de l'énergie baisse…", Theme.Danger)
+		playSound("Market")
 	end
 end)
 
@@ -1155,10 +1182,13 @@ Remotes.Event("Notify").OnClientEvent:Connect(function(payload)
 	end
 	if payload.Kind == "cash" then
 		spawnCashPopup(payload.Amount or 0)
+		playSound("Cash")
 	elseif payload.Kind == "error" then
 		spawnToast("⚠️ " .. tostring(payload.Text), Theme.Danger)
+		playSound("Error")
 	elseif payload.Kind == "build" then
 		spawnToast("🏗️ " .. tostring(payload.Text), Theme.Accent)
+		playSound(string.find(tostring(payload.Text), "REBIRTH") and "Rebirth" or "Build")
 	else
 		spawnToast(tostring(payload.Text), Theme.Energy)
 	end

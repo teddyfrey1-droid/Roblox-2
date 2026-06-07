@@ -28,6 +28,8 @@ Roblox-2/
     │   ├── DataService.luau          (ModuleScript) — DataStore + backup (anti-perte)
     │   ├── MarketService.luau        (ModuleScript) — prix du marché fluctuant
     │   ├── MonetizationService.luau  (ModuleScript) — Gamepasses & Dev Products
+    │   ├── LeaderboardService.luau   (ModuleScript) — classement mondial (OrderedDataStore)
+    │   ├── EnvironmentService.luau   (ModuleScript) — cycle jour/nuit dynamique
     │   └── PlotService.luau          (ModuleScript) — cœur du gameplay (plots, éco)
     │
     └── client/                   → StarterPlayer > StarterPlayerScripts
@@ -46,6 +48,8 @@ Roblox-2/
 | `src/serverstorage/DataService.luau`       | `ServerStorage > Modules > DataService`              | ModuleScript   |
 | `src/serverstorage/MarketService.luau`     | `ServerStorage > Modules > MarketService`            | ModuleScript   |
 | `src/serverstorage/MonetizationService.luau` | `ServerStorage > Modules > MonetizationService`    | ModuleScript   |
+| `src/serverstorage/LeaderboardService.luau` | `ServerStorage > Modules > LeaderboardService`      | ModuleScript   |
+| `src/serverstorage/EnvironmentService.luau` | `ServerStorage > Modules > EnvironmentService`      | ModuleScript   |
 | `src/serverstorage/PlotService.luau`       | `ServerStorage > Modules > PlotService`              | ModuleScript   |
 | `src/client/ClientMain.client.luau`   | `StarterPlayer > StarterPlayerScripts > ClientMain`       | LocalScript    |
 
@@ -126,3 +130,17 @@ Tant qu'un `Id` vaut `0`, la fonctionnalité est **désactivée proprement**
 
 Tout l'équilibrage (prix, production, capacités, rebirth, marché) se règle
 dans **`GameConfig.luau`**.
+
+---
+
+## ✨ Bonus inclus
+
+- **Classement mondial** (OrderedDataStore) affiché sur un **jumbotron 3D**
+  construit par code sur chaque base + **leaderstats natifs** (liste des joueurs).
+  Fallback automatique sur les joueurs en ligne si l'API DataStore est indispo.
+- **Sons** sur chaque action (clic, achat, vente, rebirth, marché). Basés sur un
+  asset moteur garanti (`rbxasset://...`) varié par hauteur/volume — aucun
+  téléchargement, aucune modération. Remplaçables par tes propres IDs dans
+  `GameConfig.Sounds`.
+- **Cycle jour/nuit dynamique** (`EnvironmentService`) avec luminosité qui
+  s'adapte, par-dessus l'Atmosphere + Bloom configurés via Rojo.

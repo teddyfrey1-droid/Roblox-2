@@ -115,6 +115,32 @@ GameConfig.Products = {
 }
 
 -- =========================================================================
+--  SONS (côté client)
+--  On utilise un asset MOTEUR garanti présent (rbxasset, aucun téléchargement,
+--  aucune modération) et on varie le rendu par PlaybackSpeed/Volume selon
+--  l'action. Tu peux remplacer chaque Id par un asset perso (rbxassetid://...).
+-- =========================================================================
+GameConfig.Sounds = {
+	Click   = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 1.70, Volume = 0.20 },
+	Buy     = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 0.85, Volume = 0.45 },
+	Build   = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 0.70, Volume = 0.55 },
+	Cash    = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 1.25, Volume = 0.30 },
+	Error   = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 0.55, Volume = 0.40 },
+	Rebirth = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 0.50, Volume = 0.60 },
+	Market  = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 1.45, Volume = 0.30 },
+	Open    = { Id = "rbxasset://sounds/electronicpingshort.wav", Speed = 1.50, Volume = 0.28 },
+}
+
+-- =========================================================================
+--  ENVIRONNEMENT (cycle jour/nuit dynamique)
+-- =========================================================================
+GameConfig.Environment = {
+	DayLength = 480, -- durée (s) d'un cycle de 24h complet
+	DayBrightness = 2.6,
+	NightBrightness = 0.7,
+}
+
+-- =========================================================================
 --  HELPERS DÉRIVÉS (purs : utilisables côté serveur ET client)
 -- =========================================================================
 
